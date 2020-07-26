@@ -9,3 +9,6 @@ Didnt Want to spend too much time on (I wouldnt go to production without):
     Creating VPC endpoint for S3
     Securing bucket policy to only allow request from potential VPC endpoint
     Possible better way to store AWS credentials? Since this is local .aws best thing might be a bastion...
+
+Other Decisions:
+    Originally I uploaded a JSON file to S3 as part of the plugin, later I decided that it probobly wasnt the best way to do it, decided to write a lambda function and custom resource to seed the file on stack creation.
