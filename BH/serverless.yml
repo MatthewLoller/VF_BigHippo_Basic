@@ -191,10 +191,4 @@ resources:
       Version: "1.0"
       Properties:
         ServiceToken: !GetAtt CustomPutObject.Arn
-    # Primerinvoke:
-    #   Type: Custom::LambdaInvoker
-    #   DependsOn: CustomPutObject
-    #   Properties:
-    #     ServiceToken: !GetAtt CustomPutObject.Arn
-    #     Region: ${self:provider.region}
 
