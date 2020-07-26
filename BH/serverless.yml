@@ -1,0 +1,110 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+# Service Name
+service: vf-bighippo-basic
+
+# Provider Details
+provider:
+  name: aws
+  runtime: nodejs12.x
+  # Environment Variables for Lambda Function
+  environment:
+    DYNAMODB_HIPPO_TABLE: ${self:custom.DYNAMODB_HIPPO_TABLE}
+    SOURCE_BUCKET_NAME: ${self:custom.SOURCE_BUCKET_NAME}
+  stage: dev
+  region: us-east-1
+  # IAM Role for the Lambda function
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "s3:*"
+      Resource: "*"
+    - Effect: "Allow"
+      Action: 
+        - dynamodb:PutItem
+      Resource: arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.DYNAMODB_HIPPO_TABLE}
+
+custom:
+  SOURCE_BUCKET_NAME: vf-mloller-s3-to-dynamo-mvp
+  DYNAMODB_HIPPO_TABLE: ${self:service}-hippos-${opt:stage}-MVP
+  DYNAMODB_ARN: arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.DYNAMODB_HIPPO_TABLE}
+  READANDCOPY_FUNCTION_NAME: vf-read-copy-to-dynamo-${opt:stage}-MVP
+  READANDCOPY_ARN: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:custom.READANDCOPY_FUNCTION_NAME}
+  READANDCOPYROLE_ARN: arn:aws:iam::#{AWS::AccountId}:role/${self:service}-${opt:stage}-#{AWS::Region}-lambdaRole
+  FILENAME: Fiona.json
+
+environment:
+  DYNAMODB_HIPPO_TABLE: ${self:custom.DYNAMODB_HIPPO_TABLE}
+  SOURCE_BUCKET_NAME: ${self:custom.SOURCE_BUCKET_NAME}
+  READANDCOPY_FUNCTION_NAME: ${self:custom.READANDCOPY_FUNCTION_NAME}
+  DYNAMODB_ARN: ${self:custom.DYNAMODB_ARN}
+  READANDCOPY_ARN: ${self:custom.READANDCOPY_ARN}
+  READANDCOPYROLE_ARN: ${self:custom.READANDCOPYROLE_ARN}
+  FILENAME: ${self.FILENAME}
+
+plugins:
+  - plugin
+  - serverless-pseudo-parameters
+
+functions:
+  copyToDynamoOnInit:    
+    handler: handler.readAndCopy
+    name: ${self:custom.READANDCOPY_FUNCTION_NAME}
+    description: Reads objects in s3, attempts to convert to JSON, populates data in Dynamo table
+
+# you can add CloudFormation resource templates here
+resources:
+  Resources:
+    #DynamoDB Table for Hippo data to eventually be stored
+    HippoTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        TableName: ${self:custom.DYNAMODB_HIPPO_TABLE}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+    S3Bucket:
+      Type: "AWS::S3::Bucket"
+      DeletionPolicy: Retain
+      Properties:
+        BucketName: ${self:custom.SOURCE_BUCKET_NAME}
+    
+    S3BucketPolicy:
+      Type: "AWS::S3::BucketPolicy"
+      Properties:
+        Bucket: !Ref S3Bucket
+        PolicyDocument:
+          Statement:
+            - Sid: "AllowLambdaRead"
+              Effect: "Allow"
+              Action: "s3:*"
+              Principal:
+                AWS:
+                  Fn::Join:
+                    - " "
+                    -
+                      - ${self:custom.READANDCOPYROLE_ARN}
+              Resource:
+                Fn::Join:
+                  - ""
+                  -
+                    - "arn:aws:s3:::"
+                    - ${self:custom.SOURCE_BUCKET_NAME}
+                    - "/*"
+
