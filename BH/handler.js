@@ -60,11 +60,6 @@ module.exports = {
         statusCode: 500
       }
     }
-    
-    // return {
-    //     statusCode: 200,
-    //     body: s3ObjectsJSONString
-    // }
   }
 }
 
