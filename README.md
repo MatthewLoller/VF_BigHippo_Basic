@@ -45,7 +45,7 @@ $ sls
 ```
 8) Clone repository.
 ```sh
-$ git clone https://github.com/MatthewLoller/VF_BigHippo_Basic
+$ git clone https://github.com/MatthewLoller/VF_BigHippo_Basic.git
 ```
 9) Navigate to repository.
 10) Run 'npm install' to bring in packages.
