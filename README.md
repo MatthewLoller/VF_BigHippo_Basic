@@ -39,26 +39,32 @@ This Basic version of the BigHippo Serverless project fulfills the MVP of Buildi
 ```sh
 $ npm install -g serverless
 ```
-7) Test Install by simply typing in 'serverless' or 'sls' 
+7) Test Install by simply typing in 'serverless' or 'sls'.
 ```sh
 $ sls
 ```
-8) Clone repository
+8) Clone repository.
 ```sh
-$ git clone https://github.com/MatthewLoller/VF_BigHippo_Epic.git
+$ git clone https://github.com/MatthewLoller/VF_BigHippo_Basic
 ```
-9) Update the 'service' variable in the BH/serverless.yml file to something unique! (this will be your stack name, it is also used in naming other resources)
+9) Navigate to repository.
+10) Run 'npm install' to bring in packages.
+```sh
+$ npm install
+```
+11) Navigate to /BH
+12) Update the 'service' variable in the BH/serverless.yml file to something unique! (this will be your stack name, it is also used in naming other resources)
 ```sh
 11:
 12: service: epic-vf-bighippo-{something unique}
 13: 
 ```
-10) Open the repository either in command-line or text-editor w/console (I.E. VSCode)
-11) Run Command to Deploy Stack with the profile name you configured for you AWS account
+13) Open the repository either in command-line or text-editor w/console (I.E. VSCode)
+14) Run Command to Deploy Stack with the profile name you configured for you AWS account
 ```sh
-$ - serverless deploy --{your-profile-name}
+$ serverless deploy --{your-profile-name}
 ```
-12) Wait several minutes for your stack to deploy and watch the magic
+15) Wait several minutes for your stack to deploy and watch the magic
 
 ## Verification
 Post Deploy verification steps
